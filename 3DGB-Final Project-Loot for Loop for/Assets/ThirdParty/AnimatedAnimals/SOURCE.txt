@@ -1,0 +1,6 @@
+Author: Quaternius
+Source: https://quaternius.com/packs/ultimateanimatedanimals.html
+License stated by the publisher: CC0 1.0 Universal
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Retrieved: 2026-11-19
+Imported formats: FBX and textures. Original gameplay controllers are not included.
