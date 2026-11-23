@@ -75,6 +75,7 @@ MonoBehaviour:
   sprintSpeed: 7
   turnSpeed: 720
   animator: {fileID: 3956316002670444893}
+  groundSnapDistance: 0.35
 --- !u!1001 &4365902311250424740
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -223,4 +224,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d215f84ee9dd3bc42aeb4dd115e91d85, type: 3}
   m_PrefabInstance: {fileID: 4365902311250424740}
   m_PrefabAsset: {fileID: 0}
-
