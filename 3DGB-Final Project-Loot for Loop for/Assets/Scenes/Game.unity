@@ -17057,6 +17057,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerOcclusionCutaway
   target: {fileID: 591318384}
+  cutawayShader: {fileID: 4800000, guid: d8b0384090cab3543867cc131bdbc7fd, type: 3}
+  playerRadius: 0.075
+  aimRadius: 0.065
+  feather: 0.012
+  stumpHeight: 0.65
 --- !u!1001 &331058164
 PrefabInstance:
   m_ObjectHideFlags: 0
