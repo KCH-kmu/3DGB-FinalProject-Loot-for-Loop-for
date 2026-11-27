@@ -121,6 +121,8 @@ public static class RaidBoundaryAuthoring
             var collider = wall.AddComponent<BoxCollider>();
             collider.size = new Vector3(1.8f, 28, Vector3.Distance(a, b) + 2);
         }
+        var layout = Object.FindAnyObjectByType<RaidMapLayout>();
+        if (layout) layout.ScaleGeometry(root.transform);
         Physics.SyncTransforms();
         Validate();
         RebuildNavigation();
@@ -169,6 +171,7 @@ public static class RaidBoundaryAuthoring
         var root = GameObject.Find(RootName);
         if (!root) throw new System.InvalidOperationException("Raid boundary is missing.");
         var cores = root.transform.Find("Continuous_Cliff_Collision");
+        var perimeter = Perimeter.Select(p => root.transform.TransformPoint(p)).ToArray();
         if (!cores || cores.GetComponentsInChildren<BoxCollider>().Length != Perimeter.Length)
             throw new System.InvalidOperationException("Incomplete boundary collision.");
         var otherColliders = Object.FindObjectsByType<Collider>(FindObjectsSortMode.None)
@@ -186,10 +189,10 @@ public static class RaidBoundaryAuthoring
             controller.skinWidth = .032f;
             controller.stepOffset = .3f;
             controller.slopeLimit = 45;
-            for (int i = 0; i < Perimeter.Length; i++)
+            for (int i = 0; i < perimeter.Length; i++)
             {
-                var a = Perimeter[i];
-                var b = Perimeter[(i + 1) % Perimeter.Length];
+                var a = perimeter[i];
+                var b = perimeter[(i + 1) % perimeter.Length];
                 var along = (b - a).normalized;
                 var outward = new Vector3(-along.z, 0, along.x);
                 int samples = Mathf.CeilToInt(Vector3.Distance(a, b) / .5f);
@@ -201,7 +204,7 @@ public static class RaidBoundaryAuthoring
                         checks++;
                     }
                 }
-                var incoming = (a - Perimeter[(i + Perimeter.Length - 1) % Perimeter.Length]).normalized;
+                var incoming = (a - perimeter[(i + perimeter.Length - 1) % perimeter.Length]).normalized;
                 var cornerOutward = (outward + new Vector3(-incoming.z, 0, incoming.x)).normalized;
                 CheckCrossing(controller, a, cornerOutward, .2f);
                 checks++;
@@ -222,7 +225,7 @@ public static class RaidBoundaryAuthoring
     static void CheckCrossing(CharacterController controller, Vector3 edge, Vector3 outward, float height)
     {
         controller.enabled = false;
-        controller.transform.position = edge - outward * 3 + Vector3.up * height;
+        controller.transform.position = edge - outward * 6 + Vector3.up * height;
         controller.enabled = true;
         Physics.SyncTransforms();
         for (int step = 0; step < 35; step++) controller.Move(outward * .35f);
