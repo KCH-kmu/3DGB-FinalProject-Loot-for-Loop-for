@@ -151,8 +151,7 @@ public static class RaidDensityAuthoring
             go.transform.position+=Vector3.up*(p.y-bottom-.035f);
             if(decoration)
             {
-                foreach(var c in go.GetComponentsInChildren<Collider>())c.enabled=false;
-                var modifier=go.GetComponent<NavMeshModifier>();if(!modifier)modifier=go.AddComponent<NavMeshModifier>();modifier.ignoreFromBuild=true;
+                RaidFoliageAuthoring.MakeDecorative(go);
             }
             positions.Add(p);if(!decoration)treePositions.Add(p);
             placed++;Physics.SyncTransforms();
