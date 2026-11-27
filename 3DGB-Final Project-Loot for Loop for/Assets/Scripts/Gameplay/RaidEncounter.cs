@@ -1,16 +1,17 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
 public class RaidEncounter : MonoBehaviour {
  public bool isCrate;
+ public string crateLabel="Supply crate";
+ public string lootPreview="Ammo x20 / Medical supplies x1";
  public float detectionRange=10,attackRange=1.8f;
  Transform player;NavMeshAgent agent;Animator animator;
- float nextAttack,attackEnd,hitTime;bool alerted,searched,attacking,hitApplied;string loot="";
+ float nextAttack,attackEnd,hitTime;bool alerted,attacking,hitApplied;
  void Start(){var p=FindFirstObjectByType<TopDownPlayer>();if(p)player=p.transform;agent=GetComponent<NavMeshAgent>();animator=GetComponentInChildren<Animator>();}
  bool Visible(){var start=transform.position+Vector3.up;var end=player.position+Vector3.up;return !Physics.Linecast(start,end,out var hit,CombatPhysics.RaycastMask,QueryTriggerInteraction.Ignore)||hit.transform.IsChildOf(player);}
  void Update(){
  if(!player)return;float distance=Vector3.Distance(transform.position,player.position);
- if(isCrate){if(distance<2.5f&&Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame&&!searched){searched=true;loot="Ammo x20 / Medical supplies x1";}return;}
+ if(isCrate)return; // LootContainer and PlayerInventory own container interaction.
  if(!agent||!agent.isOnNavMesh)return;
  if(attacking){
  agent.isStopped=true;agent.velocity=Vector3.zero;
@@ -29,6 +30,5 @@ public class RaidEncounter : MonoBehaviour {
  if(animator){animator.SetBool("Moving",false);animator.CrossFadeInFixedTime("Attack",.08f);}
  }
  }
- void OnGUI(){if(isCrate&&player&&Vector3.Distance(transform.position,player.position)<2.5f)GUI.Box(new Rect(Screen.width/2-180,Screen.height-100,360,65),searched?"Search complete\n"+loot:"[E] Search supply crate");}
 }
 

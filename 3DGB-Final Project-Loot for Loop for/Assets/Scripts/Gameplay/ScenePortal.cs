@@ -28,6 +28,8 @@ public sealed class ScenePortal : MonoBehaviour
     }
     void OnGUI()
     {
+        var player = FindAnyObjectByType<PlayerInventory>();
+        if (player && player.IsOpen) return;
         GUI.Box(new Rect(16, 16, 410, 52), loading
             ? "Loading forest..."
             : "WASD / Arrow keys: Move    Shift: Sprint\nEnter the blue portal in the front room to deploy.");

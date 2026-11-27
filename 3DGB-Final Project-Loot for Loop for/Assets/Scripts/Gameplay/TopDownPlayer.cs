@@ -12,16 +12,22 @@ public sealed class TopDownPlayer : MonoBehaviour
     float verticalSpeed;
     [SerializeField, Min(0)] float groundSnapDistance = 0.35f;
     readonly RaycastHit[] groundHits = new RaycastHit[16];
+    PlayerInventory inventory;
     public bool InputEnabled { get; set; } = true;
     public Animator Animator { set => animator = value; }
 
-    void Awake() => controller = GetComponent<CharacterController>();
+    void Awake()
+    {
+        controller = GetComponent<CharacterController>();
+        inventory = GetComponent<PlayerInventory>();
+        if (!inventory) inventory = gameObject.AddComponent<PlayerInventory>();
+    }
     void Update()
     {
         var keyboard = Keyboard.current;
         Vector2 input = Vector2.zero;
         bool sprint = false;
-        if (InputEnabled && keyboard != null)
+        if (InputEnabled && !inventory.IsOpen && keyboard != null)
         {
             input.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1 : 0)
                     - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1 : 0);
