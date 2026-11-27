@@ -1,0 +1,6 @@
+Post Apocalyptic Building — Korboleev
+Source listing: https://www.fab.com/listings/16c1cb3b-d560-4410-8e9e-fd64b7095a54
+Imported from the user's existing Unreal Project_AA asset using Unreal Editor 5.8.4 export tools.
+Original Unreal package: /Game/Fab/Post_Apocalyptic_Building/post_apocalyptic_building_free
+Files: FBX static mesh and three original texture maps; Unity URP material is configured by UnrealAssetExampleAuthoring.
+The original asset license continues to apply. This attribution file does not grant additional rights.
