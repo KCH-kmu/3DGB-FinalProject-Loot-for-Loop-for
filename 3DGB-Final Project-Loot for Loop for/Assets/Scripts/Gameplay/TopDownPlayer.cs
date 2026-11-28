@@ -13,6 +13,7 @@ public sealed class TopDownPlayer : MonoBehaviour
     [SerializeField, Min(0)] float groundSnapDistance = 0.35f;
     readonly RaycastHit[] groundHits = new RaycastHit[16];
     PlayerInventory inventory;
+    HideoutDialogue dialogue;
     public bool InputEnabled { get; set; } = true;
     public Animator Animator { set => animator = value; }
 
@@ -21,13 +22,14 @@ public sealed class TopDownPlayer : MonoBehaviour
         controller = GetComponent<CharacterController>();
         inventory = GetComponent<PlayerInventory>();
         if (!inventory) inventory = gameObject.AddComponent<PlayerInventory>();
+        dialogue = GetComponent<HideoutDialogue>();
     }
     void Update()
     {
         var keyboard = Keyboard.current;
         Vector2 input = Vector2.zero;
         bool sprint = false;
-        if (InputEnabled && !inventory.IsOpen && keyboard != null)
+        if (InputEnabled && !inventory.IsOpen && (!dialogue || !dialogue.IsBlocking) && keyboard != null)
         {
             input.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1 : 0)
                     - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1 : 0);

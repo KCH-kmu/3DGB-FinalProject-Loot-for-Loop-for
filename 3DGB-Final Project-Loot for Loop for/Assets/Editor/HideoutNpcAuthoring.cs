@@ -59,12 +59,17 @@ public static class HideoutNpcAuthoring
         var left = new GameObject("Left_LivingAndSupplies").transform; left.SetParent(root.transform);
         var right = new GameObject("Right_CombatAndExploration").transform; right.SetParent(root.transform);
         for (int i = 0; i < Models.Length; i++) BuildStation(i, i < 4 ? left : right);
+        var player = Object.FindAnyObjectByType<TopDownPlayer>();
+        if (!player) throw new InvalidOperationException("Hideout player missing.");
+        var dialogue = player.GetComponent<HideoutDialogue>();
+        if (!dialogue) dialogue = Undo.AddComponent<HideoutDialogue>(player.gameObject);
+        dialogue.koreanFont = font; EditorUtility.SetDirty(dialogue);
         AssetDatabase.SaveAssets(); Physics.SyncTransforms();
         Validate();
         EditorSceneManager.MarkSceneDirty(root.scene); EditorSceneManager.SaveScene(root.scene);
         Capture();
         Selection.activeGameObject = root;
-        Debug.Log("HIDEOUT_NPCS_READY: eight residents, counters, Korean signs, idle animations.");
+        Debug.Log("HIDEOUT_NPCS_READY: eight residents, counters, Korean signs, idle animations and E dialogue.");
     }
 
     static void BuildStation(int i, Transform parent)

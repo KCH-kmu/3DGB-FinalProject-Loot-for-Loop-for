@@ -17,6 +17,7 @@ public sealed class PlayerInventory : MonoBehaviour
     CursorLockMode previousCursorLock;
     int closedFrame = -1;
     bool viewingContainer;
+    HideoutDialogue dialogue;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetSession() => sessionBag = null;
@@ -24,6 +25,7 @@ public sealed class PlayerInventory : MonoBehaviour
     void Start()
     {
         player = GetComponent<TopDownPlayer>();
+        dialogue = GetComponent<HideoutDialogue>();
         containers = FindObjectsByType<LootContainer>();
         view = gameObject.AddComponent<InventoryView>();
         view.Initialize(this);
@@ -33,6 +35,7 @@ public sealed class PlayerInventory : MonoBehaviour
     void Update()
     {
         if (!view) return;
+        if (dialogue && dialogue.IsBlocking) { view.SetPrompt(null, false); return; }
         var keyboard = Keyboard.current;
         var health = GetComponent<RaidHealth>();
         bool alive = !health || health.health > 0;
@@ -44,7 +47,7 @@ public sealed class PlayerInventory : MonoBehaviour
             return;
         }
         var nearest = alive && player.InputEnabled ? NearestContainer() : null;
-        view.SetPrompt(nearest, alive && player.InputEnabled);
+        view.SetPrompt(nearest, alive && player.InputEnabled && (!dialogue || !dialogue.NearbyNpc));
         if (!alive || !player.InputEnabled || keyboard == null || closedFrame == Time.frameCount) return;
         if (keyboard.iKey.wasPressedThisFrame) Open(null);
         else if (keyboard.eKey.wasPressedThisFrame && nearest) Open(nearest);
@@ -66,7 +69,7 @@ public sealed class PlayerInventory : MonoBehaviour
 
     public bool Open(LootContainer container)
     {
-        if (IsOpen || !view || !player.InputEnabled) return false;
+        if (IsOpen || !view || !player.InputEnabled || (dialogue && dialogue.IsBlocking)) return false;
         var health = GetComponent<RaidHealth>();
         if (health && health.health <= 0) return false;
         if (container && !container.CanOpen(player)) return false;
