@@ -127,11 +127,17 @@ public static class InventoryValidation
                     Require(hits.Any(h => h.gameObject == button.gameObject), "Slot is reachable by UI raycast.");
                     moved = crate.Contents.Stacks[0].quantity;
                     ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerClickHandler);
-                    Require(inventory.Bag.Stacks.Sum(s => s.quantity) == moved, "Click transfers stack into bag.");
+                    Require(inventory.Bag.Stacks.Count == 0, "Single click selects without moving items.");
+                    ExecuteEvents.Execute(GameObject.Find("TransferSelected"), pointer, ExecuteEvents.pointerClickHandler);
+                    Require(inventory.Bag.Stacks.Sum(s => s.quantity) == moved, "Selected item action transfers stack into bag.");
                     Require(crate.Contents.Stacks.Sum(s => s.quantity) + moved == expected, "Click removes same quantity from container.");
+                    GridInventoryValidation.OpenContainer(inventory, crate);
+                    GridInventoryValidation.QueueControlDrag(inventory);
                     ScreenCapture.CaptureScreenshot(Path.GetFullPath(Output + "/02-stack-transferred.png"));
                     break;
                 case 3:
+                    if (!GridInventoryValidation.ControlDragComplete()) { step--; break; }
+                    InputSystem.QueueStateEvent(Keyboard.current, new KeyboardState());
                     inventory.Close();
                     Require(inventory.Open(crate), "Partially looted container can reopen.");
                     Require(crate.Contents.Stacks.Sum(s => s.quantity) == expected - moved, "Reopen preserves remaining contents.");
@@ -218,6 +224,7 @@ public static class InventoryValidation
 
     static void Finish(string report)
     {
+        GridInventoryValidation.CancelControlCheck();
         EditorApplication.update -= Tick;
         running = false;
         if (Keyboard.current != null) InputSystem.QueueStateEvent(Keyboard.current, new KeyboardState());

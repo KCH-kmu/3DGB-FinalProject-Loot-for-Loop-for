@@ -22,8 +22,14 @@ public static class RavenmoreIconAuthoring
         Assign("scrap", "ModernResources/icon_75.png");
         Assign("wire", "ModernResources/icon_122.png");
         // No matching ammunition/dressing icons in the free sets: retain the existing symbols.
-        AssetDatabase.SaveAssets();
-        Debug.Log("RAVENMORE_ICONS_CONNECTED: six items; ammunition/bandages retain symbols.");
+        const string settingsPath = "Assets/Resources/InventoryUiSettings.asset";
+        if (!AssetDatabase.IsValidFolder("Assets/Resources")) AssetDatabase.CreateFolder("Assets", "Resources");
+        var settings = AssetDatabase.LoadAssetAtPath<InventoryUiSettings>(settingsPath);
+        if (!settings) { settings = ScriptableObject.CreateInstance<InventoryUiSettings>(); AssetDatabase.CreateAsset(settings, settingsPath); }
+        settings.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/ThirdParty/NotoSansKR/NotoSansKR.ttf");
+        if (!settings.font) throw new InvalidOperationException("Korean UI font is missing.");
+        EditorUtility.SetDirty(settings); AssetDatabase.SaveAssets();
+        Debug.Log("RAVENMORE_ICONS_CONNECTED: six items; ammunition/bandages retain symbols; Korean font linked.");
     }
 
     static void Assign(string id, string icon)

@@ -102,7 +102,7 @@ public sealed class PlayerInventory : MonoBehaviour
     {
         if (!CanTransfer()) return 0;
         int moved = OpenContainer.Contents.TransferTo(index, Bag);
-        view.SetStatus(moved > 0 ? $"Moved {moved} item(s) to your bag." : "Bag full. Items remain in the container.");
+        view.SetStatus(moved > 0 ? $"{moved}개를 가방으로 옮겼습니다." : "가방이 가득 찼습니다. 아이템은 상자에 남습니다.");
         return moved;
     }
 
@@ -110,16 +110,39 @@ public sealed class PlayerInventory : MonoBehaviour
     {
         if (!CanTransfer()) return 0;
         int moved = OpenContainer.Contents.TransferAllTo(Bag);
-        view.SetStatus(OpenContainer.Contents.Stacks.Count == 0 ? "Container emptied. All items are in your bag." :
-            $"Moved {moved} item(s). Bag full; remaining items stay here.");
+        view.SetStatus(OpenContainer.Contents.Stacks.Count == 0 ? "상자의 아이템을 모두 가져왔습니다." :
+            $"{moved}개를 옮겼습니다. 가방이 가득 차 나머지는 상자에 남습니다.");
         return moved;
+    }
+
+    public LootInventory InventoryFor(bool bag) => bag ? Bag : OpenContainer ? OpenContainer.Contents : null;
+
+    public bool CanEdit(LootInventory inventory)
+    {
+        var health = GetComponent<RaidHealth>();
+        if (!IsOpen || !player.InputEnabled || (health && health.health <= 0) || (dialogue && dialogue.IsBlocking) ||
+            (viewingContainer && (!OpenContainer || !OpenContainer.CanOpen(player)))) { Close(); return false; }
+        return inventory != null && (inventory == Bag || (OpenContainer && inventory == OpenContainer.Contents));
+    }
+
+    public int MoveSlot(LootInventory source, int sourceSlot, LootInventory destination, int targetSlot, int quantity)
+        => CanEdit(source) && CanEdit(destination) ? source.Move(sourceSlot, destination, targetSlot, quantity) : 0;
+
+    public int SplitSlot(bool bag, int slot)
+    {
+        var inventory = InventoryFor(bag);
+        return CanEdit(inventory) ? inventory.Split(slot) : 0;
+    }
+
+    public int QuickTransfer(bool bag, int slot)
+    {
+        if (!CanTransfer()) return 0;
+        return InventoryFor(bag).TransferSlotTo(slot, InventoryFor(!bag));
     }
 
     bool CanTransfer()
     {
-        if (IsOpen && player.InputEnabled && OpenContainer && OpenContainer.CanOpen(player)) return true;
-        Close();
-        return false;
+        return OpenContainer && CanEdit(Bag) && CanEdit(OpenContainer.Contents);
     }
 
     void Refresh() { if (view && IsOpen) view.Refresh(); }
