@@ -1,0 +1,6 @@
+Noto Sans KR — Google Fonts / Adobe
+Source: https://github.com/google/fonts/tree/main/ofl/notosanskr
+Original filename: NotoSansKR[wght].ttf
+Retrieved: 2026-11-28
+License: SIL Open Font License 1.1; see OFL.txt.
+Used for portable Korean NPC nameplates and dialogue text.
