@@ -105,7 +105,7 @@ public static class HideoutNpcAuthoring
         var modelPath = Animals + Models[i] + ".fbx";
         var animal = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(modelPath), station.transform);
         animal.name = Models[i] + "_Resident";
-        animal.transform.localPosition = Vector3.zero; animal.transform.localRotation = Quaternion.Euler(0, i % 2 == 0 ? 25 : -25, 0);
+        animal.transform.localPosition = Vector3.zero; animal.transform.localRotation = Quaternion.identity;
         var idleSource = AssetDatabase.LoadAllAssetsAtPath(modelPath).OfType<AnimationClip>().First(c => c.name.EndsWith("|Idle"));
         idleSource.SampleAnimation(animal, 0);
         var b = BoundsOf(animal);
@@ -221,6 +221,23 @@ public static class HideoutNpcAuthoring
             File.WriteAllText(Output + "/geometry.txt", report.ToString());
         }
         finally { Object.DestroyImmediate(animal); }
+    }
+
+    [MenuItem("Tools/Gameplay/Hideout NPCs/Face Counters")]
+    public static void FaceCounters()
+    {
+        RequireScene();
+        foreach (var npc in Object.FindObjectsByType<HideoutNpc>(FindObjectsSortMode.None))
+        {
+            var animal = npc.GetComponentInChildren<Animator>().transform;
+            Undo.RecordObject(animal, "Face NPC toward counter");
+            animal.localRotation = Quaternion.identity;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(animal);
+        }
+        var scene = EditorSceneManager.GetActiveScene();
+        Validate(); Capture();
+        EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
+        Debug.Log("HIDEOUT_NPCS_FACING: residents face straight toward their counters.");
     }
 
     [MenuItem("Tools/Gameplay/Hideout NPCs/Rebuild Authored Residents")]
