@@ -17,5 +17,5 @@ MonoBehaviour:
   description: Electrical wire for crafting.
   symbol: WR
   color: {r: 0.85, g: 0.59, b: 0.37, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a699cb300becaf841bff4f546e428843, type: 3}
   maxStack: 10
