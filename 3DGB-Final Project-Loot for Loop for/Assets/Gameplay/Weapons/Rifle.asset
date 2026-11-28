@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d338fb853bd8f4d86e417f77f3d933, type: 3}
+  m_Name: Rifle
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  kind: 1
+  displayName: "\uC18C\uCD1D"
+  shotInterval: 0.09
+  burstCooldown: 0.35
+  reloadSeconds: 2.2
+  shellReloadStartSeconds: 0.35
+  spreadHalfAngle: 1.5
+  damage: 20
+  range: 80
+  startingReserve: 90
+  modelPrefab: {fileID: 6776044891800769057, guid: cc0371c6062d38243931d8eefa73f4da, type: 3}
+  gripOffset: {x: 0, y: 0, z: 0}
+  modelEuler: {x: 0, y: 0, z: 0}
+  muzzleLocalPosition: {x: 0, y: 0.1, z: 0.765}

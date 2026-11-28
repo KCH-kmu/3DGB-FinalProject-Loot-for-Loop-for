@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(-150)]
 [RequireComponent(typeof(TopDownPlayer))]
 public sealed class PlayerInventory : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public sealed class PlayerInventory : MonoBehaviour
     public LootInventory Bag => sessionBag ?? (sessionBag = new LootInventory(16));
     public LootContainer OpenContainer { get; private set; }
     public bool IsOpen { get; private set; }
+    public bool IsBlocking => IsOpen || closedFrame == Time.frameCount;
     TopDownPlayer player;
     InventoryView view;
     LootContainer[] containers;

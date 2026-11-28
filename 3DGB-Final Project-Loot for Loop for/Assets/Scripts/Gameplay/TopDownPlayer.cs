@@ -14,6 +14,7 @@ public sealed class TopDownPlayer : MonoBehaviour
     readonly RaycastHit[] groundHits = new RaycastHit[16];
     PlayerInventory inventory;
     HideoutDialogue dialogue;
+    PlayerWeaponController weapons;
     public bool InputEnabled { get; set; } = true;
     public Animator Animator { set => animator = value; }
 
@@ -23,13 +24,16 @@ public sealed class TopDownPlayer : MonoBehaviour
         inventory = GetComponent<PlayerInventory>();
         if (!inventory) inventory = gameObject.AddComponent<PlayerInventory>();
         dialogue = GetComponent<HideoutDialogue>();
+        weapons = GetComponent<PlayerWeaponController>();
+        if (!weapons) weapons = gameObject.AddComponent<PlayerWeaponController>();
     }
     void Update()
     {
         var keyboard = Keyboard.current;
         Vector2 input = Vector2.zero;
         bool sprint = false;
-        if (InputEnabled && !inventory.IsOpen && (!dialogue || !dialogue.IsBlocking) && keyboard != null)
+        bool canControl = InputEnabled && !inventory.IsBlocking && (!dialogue || !dialogue.IsBlocking);
+        if (canControl && keyboard != null)
         {
             input.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1 : 0)
                     - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1 : 0);
@@ -38,9 +42,10 @@ public sealed class TopDownPlayer : MonoBehaviour
             sprint = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
         }
         Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
-        if (direction.sqrMagnitude > 0)
+        Vector3 facing = weapons && weapons.IsAiming ? Vector3.ProjectOnPlane(weapons.AimDirection, Vector3.up) : direction;
+        if (facing.sqrMagnitude > 0)
             transform.rotation = Quaternion.RotateTowards(transform.rotation,
-                Quaternion.LookRotation(direction), turnSpeed * Time.deltaTime);
+                Quaternion.LookRotation(facing), turnSpeed * Time.deltaTime);
         bool wasGrounded = controller.isGrounded;
         if (wasGrounded && verticalSpeed < 0) verticalSpeed = -2f;
         verticalSpeed = Mathf.Max(verticalSpeed + Physics.gravity.y * Time.deltaTime, -30f);
@@ -49,8 +54,13 @@ public sealed class TopDownPlayer : MonoBehaviour
         if (wasGrounded && verticalSpeed <= 0) SnapToGround();
         if (animator)
         {
-            animator.SetBool("Moving", direction.sqrMagnitude > 0.01f);
-            animator.speed = direction.sqrMagnitude > 0.01f && sprint ? sprintSpeed / moveSpeed : 1f;
+            bool moving = direction.sqrMagnitude > .01f;
+            bool shooting = canControl && weapons && weapons.IsShooting;
+            animator.SetBool("Moving", moving);
+            animator.SetBool("Sprinting", moving && sprint);
+            animator.SetBool("Shooting", shooting);
+            // Run_Shoot has its own cadence; only accelerate the original unarmed run clip.
+            animator.speed = moving && sprint && !shooting ? sprintSpeed / moveSpeed : 1f;
         }
     }
     // Keep contact over small downward steps without pulling the player off a cliff.

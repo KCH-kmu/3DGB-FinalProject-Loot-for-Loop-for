@@ -7,7 +7,7 @@ public class RaidEncounter : MonoBehaviour {
  public float detectionRange=10,attackRange=1.8f;
  Transform player;NavMeshAgent agent;Animator animator;
  float nextAttack,attackEnd,hitTime;bool alerted,attacking,hitApplied;
- void Start(){var p=FindFirstObjectByType<TopDownPlayer>();if(p)player=p.transform;agent=GetComponent<NavMeshAgent>();animator=GetComponentInChildren<Animator>();}
+ void Start(){var p=FindAnyObjectByType<TopDownPlayer>();if(p)player=p.transform;agent=GetComponent<NavMeshAgent>();animator=GetComponentInChildren<Animator>();if(!isCrate&&!GetComponent<RaidEnemyHealth>())gameObject.AddComponent<RaidEnemyHealth>();}
  bool Visible(){var start=transform.position+Vector3.up;var end=player.position+Vector3.up;return !Physics.Linecast(start,end,out var hit,CombatPhysics.RaycastMask,QueryTriggerInteraction.Ignore)||hit.transform.IsChildOf(player);}
  void Update(){
  if(!player)return;float distance=Vector3.Distance(transform.position,player.position);
